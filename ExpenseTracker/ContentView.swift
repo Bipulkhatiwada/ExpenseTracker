@@ -16,19 +16,37 @@ struct ContentView: View {
      
     var body: some View {
         NavigationView {
-            List {
-                ForEach(expenses.items, id: \.id) { item in
-                    HStack{
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text(item.name)
-                            Text(item.type)
-                        }.padding(10)
-                        Spacer()
-                        Text(item.amount, format: .currency(code: "usd"))
+            Form{
+                List {
+                    ForEach(expenses.items, id: \.id) { item in
+                        
+                        if item.type == "business"{
+                            Section(header: Text("Business Expenses")){
+                                HStack{
+                                    VStack(alignment: .leading, spacing: 10) {
+                                        Text(item.name)
+                                        Text(item.type)
+                                    }.padding(10)
+                                    Spacer()
+                                    Text(item.amount, format: .currency(code: "usd"))
+                                }
+                            }
+                        } else if item.type == "personal"{
+                            Section(header: Text("Personal Expenses")){
+                                HStack{
+                                    VStack(alignment: .leading, spacing: 10) {
+                                        Text(item.name)
+                                        Text(item.type)
+                                    }.padding(10)
+                                    Spacer()
+                                    Text(item.amount, format: .currency(code: "usd"))
+                                }
+                            }
+                        }
+                        
                     }
-                    
+                    .onDelete(perform: removeRows) // Enable swipe-to-delete
                 }
-                .onDelete(perform: removeRows) // Enable swipe-to-delete
             }
             .navigationTitle("Expenses")
             .toolbar {
@@ -46,6 +64,7 @@ struct ContentView: View {
             .sheet(isPresented: $addExpenseViewShown){
                 AddItemView(expenses: expenses)
             }
+                
             
         }
     }
