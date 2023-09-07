@@ -8,71 +8,65 @@
 import SwiftUI
 
 struct ContentView: View {
-    
     @StateObject var expenses = Expenses()
-    
     @State private var addExpenseViewShown = false
 
-     
     var body: some View {
         NavigationView {
-            Form{
-                List {
-                    ForEach(expenses.items, id: \.id) { item in
-                        
-                        if item.type == "business"{
-                            Section(header: Text("Business Expenses")){
-                                HStack{
-                                    VStack(alignment: .leading, spacing: 10) {
-                                        Text(item.name)
-                                        Text(item.type)
-                                    }.padding(10)
-                                    Spacer()
-                                    Text(item.amount, format: .currency(code: "usd"))
-                                }
-                            }
-                        } else if item.type == "personal"{
-                            Section(header: Text("Personal Expenses")){
-                                HStack{
-                                    VStack(alignment: .leading, spacing: 10) {
-                                        Text(item.name)
-                                        Text(item.type)
-                                    }.padding(10)
-                                    Spacer()
-                                    Text(item.amount, format: .currency(code: "usd"))
-                                }
-                            }
-                        }
-                        
-                    }
-                    .onDelete(perform: removeRows) // Enable swipe-to-delete
-                }
-            }
-            .navigationTitle("Expenses")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-//                        let expense = ExpenseItem(name: "New Item", type: "Expense", amount: 0.0)
-//                        expenses.items.append(expense)
-                        addExpenseViewShown = true
-                    } label: {
-                        Image(systemName: "plus")
+            content
+                .navigationTitle("Expenses")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        addButton
                     }
                 }
-            }
-            
-            .sheet(isPresented: $addExpenseViewShown){
-                AddItemView(expenses: expenses)
-            }
-                
-            
+                .sheet(isPresented: $addExpenseViewShown) {
+                    AddItemView(expenses: expenses)
+                }
         }
     }
-    
+
+    var content: some View {
+        Form {
+            List {
+                ForEach(expenses.items) { item in
+                    Section(header: Text(item.type.capitalized + " Expenses")) {
+                        ExpenseRow(item: item)
+                    }
+                }
+                .onDelete(perform: removeRows)
+            }
+        }
+    }
+    struct ExpenseRow: View {
+        var item: ExpenseItem
+
+        var body: some View {
+            HStack {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(item.name)
+                    Text(item.type)
+                }
+                .padding(10)
+                Spacer()
+                Text(item.amount, format: .currency(code: "usd"))
+            }
+        }
+    }
+
+    var addButton: some View {
+        Button {
+            addExpenseViewShown = true
+        } label: {
+            Image(systemName: "plus")
+        }
+    }
+
     func removeRows(at offsets: IndexSet) {
         expenses.items.remove(atOffsets: offsets)
     }
 }
+
 
 
 
